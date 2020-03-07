@@ -1,7 +1,15 @@
 const React = {
   createElement: (tag, props, ...children) => {
     if (typeof tag === 'function') {
-      return tag(props);
+      try {
+        return tag(props);
+      } catch ({ promise, key }) {
+        promise.then(data => {
+          promiseCache.set(key, data);
+          reRender();
+        });
+        return { tag: 'h1', props: { children: ['Loading...'] } };
+      }
     }
 
     const element = { tag, props: { ...props, children } };
@@ -49,8 +57,26 @@ const useState = initialState => {
   return [states[currentCursor], setState];
 };
 
+const promiseCache = new Map();
+
+const createResource = (promise, key) => {
+  if (promiseCache.has(key)) {
+    return promiseCache.get(key);
+  }
+
+  throw { promise: promise(), key };
+};
+
 const App = () => {
   const [count, setCount] = useState(0);
+
+  const heroImageUrl = createResource(
+    () =>
+      fetch('https://dog.ceo/api/breeds/image/random')
+        .then(res => res.json())
+        .then(res => res.message),
+    'doggoImage'
+  );
 
   return (
     <div id="container">
@@ -67,6 +93,11 @@ const App = () => {
       <h1>Count: {count}</h1>
       <button onclick={() => setCount(count + 1)}>plus</button>
       <button onclick={() => setCount(count - 1)}>minus</button>
+      <br />
+      <hr />
+      <br />
+      <h1>Doggo</h1>
+      <img src={heroImageUrl} alt="cute doggo pic" />
     </div>
   );
 };
