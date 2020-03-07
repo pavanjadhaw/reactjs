@@ -67,9 +67,7 @@ const createResource = (promise, key) => {
   throw { promise: promise(), key };
 };
 
-const App = () => {
-  const [count, setCount] = useState(0);
-
+const DoggoImage = () => {
   const heroImageUrl = createResource(
     () =>
       fetch('https://dog.ceo/api/breeds/image/random')
@@ -77,6 +75,12 @@ const App = () => {
         .then(res => res.message),
     'doggoImage'
   );
+
+  return <img src={heroImageUrl} alt="cute doggo pic" />;
+};
+
+const App = () => {
+  const [count, setCount] = useState(0);
 
   return (
     <div id="container">
@@ -87,17 +91,15 @@ const App = () => {
         amet. Nulla, laborum cum! Libero dolores explicabo maiores neque
         officiis.
       </p>
-      <br />
       <hr />
-      <br />
       <h1>Count: {count}</h1>
       <button onclick={() => setCount(count + 1)}>plus</button>
       <button onclick={() => setCount(count - 1)}>minus</button>
       <br />
-      <hr />
       <br />
+      <hr />
       <h1>Doggo</h1>
-      <img src={heroImageUrl} alt="cute doggo pic" />
+      <DoggoImage />
     </div>
   );
 };
